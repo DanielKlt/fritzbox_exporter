@@ -53,7 +53,7 @@ var (
 	flagAddr           = flag.String("listen-address", "127.0.0.1:9042", "The address to listen on for HTTP requests.")
 	flagMetricsFile    = flag.String("metrics-file", "metrics.json", "The JSON file with the metric definitions.")
 	flagDisableLua     = flag.Bool("nolua", false, "disable collecting lua metrics")
-	flagLuaMetricsFile = flag.String("lua-metrics-file", "metrics-lua.json", "The JSON file with the lua metric definitions.")
+	flagLuaMetricsFile = flag.String("lua-metrics-file", "metrics-lua_cable.json", "The JSON file with the lua metric definitions.")
 
 	flagGatewayURL       = flag.String("gateway-url", "http://fritz.box:49000", "The URL of the FRITZ!Box")
 	flagGatewayLuaURL    = flag.String("gateway-luaurl", "http://fritz.box", "The URL of the FRITZ!Box UI")
@@ -405,6 +405,7 @@ func (fc *FritzboxCollector) getActionResult(metric *Metric, actionName string, 
 
 // Collect collect upnp metrics
 func (fc *FritzboxCollector) Collect(ch chan<- prometheus.Metric) {
+	logrus.Info("collecting metrics")
 	fc.Lock()
 	root := fc.Root
 	fc.Unlock()
@@ -485,6 +486,7 @@ func (fc *FritzboxCollector) Collect(ch chan<- prometheus.Metric) {
 	if fc.LuaSession != nil {
 		fc.collectLua(ch, dupCache)
 	}
+	logrus.Info("metrics collected")
 }
 
 func (fc *FritzboxCollector) collectLua(ch chan<- prometheus.Metric, dupCache map[string]bool) {
