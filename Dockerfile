@@ -1,19 +1,24 @@
 # syntax=docker/dockerfile:1
 
 # Build Image
-FROM golang:1.21-alpine3.18 AS builder
-RUN go install github.com/sberk42/fritzbox_exporter@latest \
-    && mkdir /app \
-    && mv /go/bin/fritzbox_exporter /app
+FROM golang:1.21-alpine AS builder
 
+RUN apk update
+RUN mkdir /app
 WORKDIR /app
 
-COPY metrics.json metrics-lua.json /app/
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
+
+COPY . .
+
+RUN go build -o /go/bin/fritzbox_exporter \
+    && mv /go/bin/fritzbox_exporter /app
 
 # Runtime Image
 FROM alpine:3.18 as runtime-image
 
-ARG REPO=sberk42/fritzbox_exporter
+ARG REPO=danielklt/fritzbox_exporter
 
 LABEL org.opencontainers.image.source https://github.com/${REPO}
 

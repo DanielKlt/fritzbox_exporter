@@ -1,11 +1,7 @@
 version: '3'
 services:
   fritzbox-prometheus-exporter:
-    hostname: fritzbox-prometheus-exporter
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: fritzbox-prometheus-exporter
+    image: fritzbox_exporter:latest
     # for dns issues like "dial tcp: lookup fritz.box on 127.0.0.11:53: no such host"
     # uncomment and fill the following line:
     # dns: YOUR_FRITZBOX_IP
@@ -14,8 +10,6 @@ services:
     #expose:
     #  - "9042"
     restart: unless-stopped
-    environment:
-      USERNAME: your_fritzbox_username 
-      PASSWORD: your_fritzbox_password
-      GATEWAY_URL: http://192.168.0.1:49000
-      LISTEN_ADDRESS: 0.0.0.0:9042
+    env_file:
+      - path: ./.env
+        required: true # default
